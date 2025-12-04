@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>3D Christmas Tree</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* 遠近感 */
+        .scene {
+            perspective: 90vmin;
+        }
+
+        /* ツリー本体：中身ごと回転させる */
+        tree {
+            position: relative;
+            height: 50vmin;
+            width: 25vmin;
+            transform-style: preserve-3d;
+            display: block;
+            animation: spin 4s infinite linear;
+        }
+
+        /* くるくる回転（少しだけ前に倒して立体感） */
+        @keyframes spin {
+            from {
+                transform: rotateX(18deg) rotateY(0deg);
+            }
+
+            to {
+                transform: rotateX(18deg) rotateY(360deg);
+            }
+        }
+
+        /* ★：ツリーの“てっぺん”に固定で置く */
+        .star {
+            position: absolute;
+            top: 0;
+            /* コンテナの一番上付近 */
+            left: 50%;
+            transform: translate(-50%, -70%);
+            /* 少し上に浮かせる */
+            font-size: 3.5vmin;
+            color: #ffeb3b;
+            text-shadow:
+                0 0 6px #ffeb3b,
+                0 0 14px #ffeb3b,
+                0 0 24px #ffeb3b;
+        }
+
+        /* ライト１つ分 */
+        .tree__light {
+            position: absolute;
+            left: 50%;
+            transform-style: preserve-3d;
+            height: 1vmin;
+            width: 1vmin;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff, #ff1744);
+            box-shadow:
+                0 0 5px #ff1744,
+                0 0 10px #ff1744,
+                0 0 15px #ff1744;
+
+            /* y 方向：0〜100% を上→下として使う */
+            top: calc(var(--y, 0) * 1%);
+
+            /* 中心に合わせてから、Y軸回転→Z方向に押し出し */
+            transform:
+                translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
+
+            /* 点滅アニメーション */
+            animation: blink 2s infinite ease-in-out;
+            animation-delay: var(--delay, 0s);
+        }
+
+        /* 点滅 */
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 0.25;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scene">
+        <tree id="tree">
+            <!-- 先端の星：ツリーと一緒に回転する -->
+            <div class="star">★</div>
+        </tree>
+    </div>
+
+    <script>
+        const tree = document.getElementById("tree");
+
+        // ライト設定
+        const LIGHT_COUNT = 140;  // 数を増やすと密度アップ
+        const TURNS = 4;          // 何周まわるか
+        const MIN_RADIUS = 2;     // 上の半径（細い）
+        const MAX_RADIUS = 12;    // 下の半径（太い）
+
+        for (let i = 0; i < LIGHT_COUNT; i++) {
+            const light = document.createElement("div");
+            light.className = "tree__light";
+
+            // t: 0 = 上, 1 = 下　（上から巻き下りるイメージ）
+            const t = i / (LIGHT_COUNT - 1);
+
+            // 高さ（上 5% → 下 95%）
+            const y = 5 + t * 90;
+
+            // 回転角度：螺旋
+            const rotate = t * 360 * TURNS;
+
+            // ★ここを修正：上が細く、下が太い正しいツリー型
+            const radius = MIN_RADIUS * (1 - t) + MAX_RADIUS * t;
+
+            // 点滅タイミングをランダム化
+            const delay = Math.random() * 2;
+
+            light.style.setProperty("--y", y);
+            light.style.setProperty("--rotate", rotate);
+            light.style.setProperty("--radius", radius);
+            light.style.setProperty("--delay", `${delay}s`);
+
+            // 白・赤をランダムに混ぜる
+            if (Math.random() > 0.5) {
+                light.style.background = "radial-gradient(circle, #ffffff, #ffffff)";
+                light.style.boxShadow =
+                    "0 0 5px #ffffff, 0 0 10px #ffffff, 0 0 15px #ffffff";
+            }
+
+            tree.appendChild(light);
+        }
+    </script>
+</body>
+
+</html>
