@@ -132,14 +132,14 @@
             font-family: 'Great Vibes', cursive;
             /* 手書き風フォント */
             font-size: 50px;
-            fill: transparent;
-            /* 最初は中身透明 */
-            stroke: url(#goldGradient);
-            /* 輪郭を金色のグラデーションで描く */
+            fill: none;
+            /* 最初は塗りなし */
+            stroke: #e6c200;
+            /* 輪郭は単色の金色（Safari対策） */
             stroke-width: 1.5px;
-            stroke-dasharray: 1000;
-            /* 線の長さ（十分に長く） */
-            stroke-dashoffset: 1000;
+            stroke-dasharray: 3000;
+            /* 線の長さを十分に確保 */
+            stroke-dashoffset: 3000;
             /* 最初は隠しておく */
             animation:
                 draw 4s ease-out forwards,
