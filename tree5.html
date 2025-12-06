@@ -24,6 +24,7 @@
             align-items: center;
             overflow: hidden;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
         }
 
         .scene {
@@ -34,6 +35,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 1;
         }
 
         tree {
@@ -107,18 +109,20 @@
         }
 
         /* 手書き風文字のアニメーションコンテナ */
+        /* .sceneの外に出してZ-indexで手前に表示 */
         .message-container {
             position: absolute;
-            bottom: 2vmin;
+            bottom: 5vmin;
             left: 50%;
             transform: translateX(-50%);
-            width: 80vmin;
-            /* 幅を広めに確保 */
-            height: 15vmin;
+            width: 90vmin;
+            height: 20vmin;
             pointer-events: none;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 1000;
+            /* 最前面に表示 */
         }
 
         /* SVGテキストの設定 */
@@ -130,24 +134,25 @@
 
         .handwriting-text {
             font-family: 'Great Vibes', cursive;
-            /* 手書き風フォント */
             font-size: 50px;
-            fill: none;
-            /* 最初は塗りなし */
+
+            /* 塗りつぶしの設定（不透明度アニメーション用） */
+            fill: url(#goldGradient);
+            fill-opacity: 0;
+            /* 最初は透明 */
+
+            /* 輪郭（ストローク）の設定 - Safari対策で単色 */
             stroke: #e6c200;
-            /* 輪郭は単色の金色（Safari対策） */
             stroke-width: 1.5px;
+
+            /* アニメーション用ライン設定 */
             stroke-dasharray: 3000;
-            /* 線の長さを十分に確保 */
             stroke-dashoffset: 3000;
-            /* 最初は隠しておく */
+
             animation:
                 draw 4s ease-out forwards,
-                /* 線を描くアニメーション */
                 fill-in 2s ease-in-out 3s forwards;
-            /* 中身を塗るアニメーション（少し遅れて開始） */
 
-            /* 光彩（グロー）効果 */
             filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
         }
 
@@ -158,12 +163,11 @@
             }
         }
 
-        /* 中身を金色で満たす */
+        /* 中身を不透明にする（徐々に表示） */
         @keyframes fill-in {
             to {
-                fill: url(#goldGradient);
+                fill-opacity: 1;
                 stroke-width: 0;
-                /* 塗りつぶしたら線は消す（または細くする） */
             }
         }
 
@@ -216,27 +220,27 @@
                 </svg>
             </div>
         </tree>
+    </div>
 
-        <!-- 手書き風文字 (SVG) -->
-        <div class="message-container">
-            <svg class="handwriting-svg" viewBox="0 0 400 100">
-                <!-- 金色のグラデーション定義 -->
-                <defs>
-                    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#BF953F" />
-                        <stop offset="25%" stop-color="#FCF6BA" />
-                        <stop offset="50%" stop-color="#B38728" />
-                        <stop offset="75%" stop-color="#FBF5B7" />
-                        <stop offset="100%" stop-color="#AA771C" />
-                    </linearGradient>
-                </defs>
+    <!-- 手書き風文字 (SVG) - sceneの外に出してZ-indexを効かせる -->
+    <div class="message-container">
+        <svg class="handwriting-svg" viewBox="0 0 400 100">
+            <!-- 金色のグラデーション定義 -->
+            <defs>
+                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#BF953F" />
+                    <stop offset="25%" stop-color="#FCF6BA" />
+                    <stop offset="50%" stop-color="#B38728" />
+                    <stop offset="75%" stop-color="#FBF5B7" />
+                    <stop offset="100%" stop-color="#AA771C" />
+                </linearGradient>
+            </defs>
 
-                <!-- テキスト本体 -->
-                <text x="50%" y="65%" text-anchor="middle" class="handwriting-text">
-                    2025 Merry Christmas
-                </text>
-            </svg>
-        </div>
+            <!-- テキスト本体 -->
+            <text x="50%" y="65%" text-anchor="middle" class="handwriting-text">
+                2025 Merry Christmas
+            </text>
+        </svg>
     </div>
 
     <script>
@@ -275,6 +279,7 @@
         }
 
         // 背景の星
+        /* .sceneに追加するが、z-index的に文字より後ろになるはず */
         const scene = document.querySelector(".scene");
         const STAR_COUNT = 40;
 
