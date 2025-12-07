@@ -98,6 +98,94 @@
             height: 100%;
         }
 
+        < !DOCTYPE html><html lang="ja"><head><meta charset="UTF-8" /><title>3D Christmas Tree</title>< !-- 手書き風フォントの読み込み --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet"><style>* {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            /* スクロール防止 */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+            /* 星の基準 */
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* 画面いっぱいまで拡大 */
+            width: 100vmin;
+            height: 100vmin;
+            position: relative;
+            z-index: 10;
+            /* 星より手前 */
+        }
+
+        .scene {
+            perspective: 90vmin;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            /* 親に合わせて最大化 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        tree {
+            position: relative;
+            /* ツリーサイズさらに拡大 */
+            height: 80vmin;
+            width: 45vmin;
+            transform-style: preserve-3d;
+            display: block;
+            animation: spin 2.5s infinite linear;
+            margin-top: -5vmin;
+            /* 少し調整 */
+            will-change: transform;
+            /* パフォーマンス最適化 */
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotateX(18deg) rotateY(0deg);
+            }
+
+            to {
+                transform: rotateX(18deg) rotateY(360deg);
+            }
+        }
+
+        /* 星 */
+        .star {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 12vmin;
+            /* さらに拡大 */
+            height: 12vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* ドロップシャドウも金色系に */
+            filter: drop-shadow(0 0 1px #e6c200) drop-shadow(0 0 4px #e6c200);
+        }
+
+        .star__svg {
+            width: 100%;
+            height: 100%;
+        }
+
         /* ライト */
         .tree__light {
             position: absolute;
@@ -117,8 +205,7 @@
                 translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
             animation: blink 2s infinite ease-in-out;
             animation-delay: var(--delay, 0s);
-            will-change: transform, opacity;
-            /* パフォーマンス最適化 */
+            /* will-change削除: モバイルでのメモリ負荷軽減 */
         }
 
         @keyframes blink {
@@ -224,21 +311,21 @@
             }
         }
 
-        /* 水滴ライト */
+        /* 水滴ライト: ゴールドグラデーション、will-change削除 */
         .rain-drop {
             position: absolute;
             top: -15vh;
             /* 画面外からスタート */
             width: 2px;
             height: 15vh;
-            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9));
+            /* ゴールドグラデーションに変更 */
+            background: linear-gradient(to bottom, transparent, #BF953F, #FCF6BA, #AA771C, transparent);
             animation: fall linear infinite;
             pointer-events: none;
             z-index: 20;
             /* ツリーより手前、文字より奥 */
             opacity: 0;
-            will-change: transform;
-            /* パフォーマンス最適化 */
+            /* will-change削除: パフォーマンス最適化 */
         }
 
         @keyframes fall {
@@ -344,8 +431,8 @@
             tree.appendChild(light);
         }
 
-        // 背景の星（全画面ランダム）
-        const STAR_COUNT = 150;
+        // 背景の星（全画面ランダム）- 30%削減
+        const STAR_COUNT = 100;
 
         for (let i = 0; i < STAR_COUNT; i++) {
             const s = document.createElement("div");
@@ -378,8 +465,8 @@
             document.body.appendChild(s);
         }
 
-        // 水滴ライト (Rain Lights)
-        const RAIN_COUNT = 40;
+        // 水滴ライト (Rain Lights) - 30%削減
+        const RAIN_COUNT = 28;
 
         for (let i = 0; i < RAIN_COUNT; i++) {
             const drop = document.createElement("div");
