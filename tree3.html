@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8" />
     <title>3D Christmas Tree</title>
+    <!-- スマートフォン対応用ビューポート設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <!-- 手書き風フォントの読み込み -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -310,6 +312,37 @@
             /* 少し目立たせる */
             filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
             will-change: left, top;
+        }
+
+        /* スマートフォン・縦画面向けの最適化 */
+        @media (max-width: 768px) and (orientation: portrait) {
+            tree {
+                /* ツリーを大きく表示 */
+                width: 80vmin;
+                height: 110vmin;
+                margin-top: -10vmin;
+            }
+
+            .main-wrapper {
+                /* 画面の縦幅を有効活用 */
+                height: 100vh;
+                width: 100vw;
+            }
+
+            .message-container {
+                /* 文字位置の調整 */
+                bottom: 10vh;
+                height: 15vh;
+            }
+
+            /* パフォーマンス: スマホでは重いエフェクトを少し軽減 */
+            .star {
+                filter: drop-shadow(0 0 2px #ffd700) drop-shadow(0 0 8px #e6c200);
+            }
+
+            .tree__light {
+                box-shadow: 0 0 2px 0px #ffffff, 0 0 4px 1px rgba(255, 223, 0, 0.4);
+            }
         }
     </style>
 </head>
@@ -675,7 +708,9 @@
 
             if (Math.random() < 0.1) return;
 
-            const count = 2; // 一度に生成する数を少し減らして負荷軽減 (3 -> 2)
+            // スマホかどうか判定してパーティクル数を調整
+            const isMobile = window.innerWidth < 768;
+            const count = isMobile ? 1 : 2; // スマホなら1つ、PCなら2つ
 
             for (let i = 0; i < count; i++) {
                 const star = document.createElement('div');
@@ -714,3 +749,4 @@
 </body>
 
 </html>
+
