@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>3D Christmas Tree</title>
+    <!-- 手書き風フォントの読み込み -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            /* スクロール防止 */
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+            /* 星の基準 */
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* 画面いっぱいまで拡大 */
+            width: 100vmin;
+            height: 100vmin;
+            position: relative;
+            z-index: 10;
+            /* 星より手前 */
+        }
+
+        .scene {
+            perspective: 90vmin;
+            position: relative;
+            width: 100%;
+            height: 100%;
+            /* 親に合わせて最大化 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        tree {
+            position: relative;
+            /* ツリーサイズ調整: 高さを抑えて幅広に */
+            height: 65vmin;
+            width: 45vmin;
+            transform-style: preserve-3d;
+            display: block;
+            animation: spin 2.5s infinite linear;
+            margin-top: -5vmin;
+            /* 少し調整 */
+            will-change: transform;
+            /* パフォーマンス最適化 */
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotateX(18deg) rotateY(0deg);
+            }
+
+            to {
+                transform: rotateX(18deg) rotateY(360deg);
+            }
+        }
+
+        /* 星 */
+        .star {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -60%);
+            width: 12vmin;
+            /* さらに拡大 */
+            height: 12vmin;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* ドロップシャドウも金色系に */
+            filter: drop-shadow(0 0 1px #e6c200) drop-shadow(0 0 4px #e6c200);
+        }
+
+        .star__svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* ライト */
+        .tree__light {
+            position: absolute;
+            left: 50%;
+            transform-style: preserve-3d;
+            height: 1.4vmin;
+            /* さらに拡大 */
+            width: 1.4vmin;
+            border-radius: 50%;
+            background: radial-gradient(circle, #ffffff, #ff1744);
+            box-shadow:
+                0 0 2px #ff1744,
+                0 0 4px #ff1744;
+            /* 負荷軽減のため縮小 */
+            top: calc(var(--y, 0) * 1%);
+            transform:
+                translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
+            animation: blink 2s infinite ease-in-out;
+            animation-delay: var(--delay, 0s);
+            /* will-change削除: モバイルでのメモリ負荷軽減 */
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 0.5;
+            }
+
+            50% {
+                opacity: 1;
+            }
+        }
+
+        /* 手書き風文字のアニメーションコンテナ */
+        /* body直下に配置し、画面全幅を使う */
+        .message-container {
+            position: absolute;
+            bottom: 8vmin;
+            left: 0;
+            width: 100%;
+            /* 画面幅いっぱい */
+            height: 25vmin;
+            pointer-events: none;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            /* 下揃え */
+            z-index: 1000;
+        }
+
+        /* SVGテキストの設定 */
+        .handwriting-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .handwriting-text {
+            font-family: 'Great Vibes', cursive;
+            font-size: 60px;
+            fill: url(#goldGradient);
+            fill-opacity: 1;
+            /* 最初から表示 */
+            stroke: none;
+            /* ストロークなし */
+            filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
+            /* アニメーション削除 */
+        }
+
+        /* 背景の星（ランダム配置用） */
+        .bg-star {
+            position: absolute;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow:
+                0 0 2px rgba(255, 255, 255, 0.9),
+                0 0 4px rgba(255, 255, 255, 0.8);
+            opacity: 0.7;
+            animation: tinyBlink 3s infinite ease-in-out;
+            z-index: 0;
+            /* 最背面 */
+        }
+
+        .four-point-star-bg {
+            position: absolute;
+            background: white;
+            clip-path: polygon(50% 0%, 65% 40%, 100% 50%, 65% 60%, 50% 100%, 35% 60%, 0% 50%, 35% 40%);
+            opacity: 0.8;
+            animation: tinyBlink 3s infinite ease-in-out;
+            z-index: 0;
+        }
+
+        @keyframes tinyBlink {
+
+            0%,
+            100% {
+                opacity: 0.2;
+                transform: scale(0.6);
+            }
+
+            50% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        /* 雪の結晶 */
+        .snowflake {
+            position: absolute;
+            top: -10vh;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            user-select: none;
+            pointer-events: none;
+            z-index: 20;
+            /* ツリーより手前 */
+            animation: snowfall linear infinite;
+        }
+
+        @keyframes snowfall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 0.9;
+            }
+
+            90% {
+                opacity: 0.9;
+            }
+
+            100% {
+                transform: translateY(110vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <div class="scene">
+            <tree id="tree">
+                <!-- 星: 枠線のみ -->
+                <div class="star">
+                    <svg class="star__svg" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="starStrokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#BF953F" />
+                                <stop offset="25%" stop-color="#FCF6BA" />
+                                <stop offset="50%" stop-color="#B38728" />
+                                <stop offset="75%" stop-color="#FBF5B7" />
+                                <stop offset="100%" stop-color="#AA771C" />
+                            </linearGradient>
+                        </defs>
+                        <polygon points="50,5 61,35 95,38 68,59 76,91 50,73 24,91 32,59 5,38 39,35" fill="none"
+                            stroke="url(#starStrokeGradient)" stroke-width="5" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </tree>
+        </div>
+    </div>
+
+    <!-- 手書き風文字 (SVG) - main-wrapperの外に出して全幅確保 -->
+    <div class="message-container">
+        <!-- viewBox広め、文字は中央配置（全幅なので中央でOK） -->
+        <svg class="handwriting-svg" viewBox="0 0 600 100">
+            <!-- グラデーション定義 -->
+            <defs>
+                <!-- 文字・星枠線用 -->
+                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#BF953F" />
+                    <stop offset="25%" stop-color="#FCF6BA" />
+                    <stop offset="50%" stop-color="#B38728" />
+                    <stop offset="75%" stop-color="#FBF5B7" />
+                    <stop offset="100%" stop-color="#AA771C" />
+                </linearGradient>
+            </defs>
+
+            <!-- テキスト本体 -->
+            <text x="50%" y="70%" text-anchor="middle" class="handwriting-text">
+                2025 Merry Christmas
+            </text>
+        </svg>
+    </div>
+
+    <script>
+        const tree = document.getElementById("tree");
+
+        // ライト設定
+        const LIGHT_COUNT = 80;
+        const TURNS = 3;
+        const MIN_RADIUS = 1.2;
+        const MAX_RADIUS = 17;
+
+        // ライト生成
+        for (let i = 0; i < LIGHT_COUNT; i++) {
+            const light = document.createElement("div");
+            light.className = "tree__light";
+
+            const t = i / (LIGHT_COUNT - 1);
+
+            const y = 6 + t * 86;
+            const rotate = t * 360 * TURNS;
+            const radius = MIN_RADIUS * (1 - t) + MAX_RADIUS * t;
+            const delay = Math.random() * 2;
+
+            light.style.setProperty("--y", y);
+            light.style.setProperty("--rotate", rotate);
+            light.style.setProperty("--radius", radius);
+            light.style.setProperty("--delay", `${delay}s`);
+
+            // 白い光の設定
+            if (Math.random() > 0.5) {
+                light.style.background = "radial-gradient(circle, #ffffff, #ffffff)";
+                light.style.boxShadow =
+                    "0 0 3px #ffffff, 0 0 6px #ffffff";
+            }
+
+            tree.appendChild(light);
+        }
+
+        // 背景の星（全画面ランダム）- さらに20%減 (100 -> 80)
+        const STAR_COUNT = 80;
+
+        for (let i = 0; i < STAR_COUNT; i++) {
+            const s = document.createElement("div");
+            const isFourPoint = Math.random() > 0.4;
+            let size;
+
+            if (isFourPoint) {
+                s.className = "four-point-star-bg";
+                const hue = Math.floor(Math.random() * 360);
+                s.style.background = `hsl(${hue}, 80%, 70%)`;
+                // サイズランダム（大・小混ぜる）
+                size = 0.5 + Math.random() * 2.5;
+            } else {
+                s.className = "bg-star";
+                size = 0.3 + Math.random() * 1.5;
+            }
+
+            s.style.width = `${size}vmin`;
+            s.style.height = `${size}vmin`;
+
+            // 画面全体に配置 (0-100%)
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+
+            s.style.left = `${x}%`;
+            s.style.top = `${y}%`;
+            s.style.animationDelay = `${Math.random() * 3}s`;
+
+            // bodyに追加
+            document.body.appendChild(s);
+        }
+
+        // 雪の結晶 (Snowflakes) - ゆっくり落ちる
+        const SNOW_COUNT = 30;
+        const snowChars = ['\u2744', '\u2745', '\u2746']; // ❄, ❅, ❆
+
+        for (let i = 0; i < SNOW_COUNT; i++) {
+            const flake = document.createElement("div");
+            flake.className = "snowflake";
+
+            // 雪の文字をランダムに選択
+            flake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
+
+            // X座標はランダム
+            flake.style.left = Math.random() * 100 + "%";
+
+            // サイズをランダムに (1.5vmin ~ 3.5vmin)
+            const size = 1.5 + Math.random() * 2;
+            flake.style.fontSize = `${size}vmin`;
+
+            // アニメーション時間 (遅く: 5s〜10s)
+            const duration = 5 + Math.random() * 5;
+            const delay = Math.random() * 5;
+
+            flake.style.animationDuration = `${duration}s`;
+            flake.style.animationDelay = `${delay}s`;
+
+            document.body.appendChild(flake);
+        }
+
+        /* ----------------------------------------------------
+           マウス・タッチ操作のきらきら星 (Mouse Sparkle Effect)
+           ---------------------------------------------------- */
+
+        // CSSを動的に追加
+        const sparkleStyle = document.createElement("style");
+        sparkleStyle.textContent = `
+            .cursor-star {
+                position: absolute;
+                pointer-events: none;
+                z-index: 9999;
+                color: white;
+                font-size: 1.5rem;
+                user-select: none;
+                line-height: 1;
+                text-shadow: 0 0 5px gold, 0 0 10px orange;
+                animation: star-fade 3s forwards ease-out; /* 3秒かけてゆっくり消える */
+                will-change: transform, opacity;
+            }
+
+            @keyframes star-fade {
+                0% {
+                    opacity: 1;
+                    transform: scale(1) translate(0, 0) rotate(0deg);
+                }
+                100% {
+                    opacity: 0;
+                    transform: scale(0) translate(var(--tx), var(--ty)) rotate(180deg);
+                }
+            }
+        `;
+        document.head.appendChild(sparkleStyle);
+
+        // イベントリスナー設定
+        document.addEventListener('mousemove', (e) => createSparkle(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => {
+            // e.preventDefault(); // スクロールが必要ならコメントアウト
+            const touch = e.touches[0];
+            createSparkle(touch.clientX, touch.clientY);
+        });
+
+        function createSparkle(x, y) {
+            // 密度を10%減らす（10%の確率で生成スキップ）
+            if (Math.random() < 0.1) return;
+
+            // 一度に生成する星の数
+            const count = 2;
+
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'cursor-star';
+
+                // 星の種類
+                const chars = ['✦', '★', '✧', '✵'];
+                star.textContent = chars[Math.floor(Math.random() * chars.length)];
+
+                // 色のバリエーション
+                const colors = ['#ffffff', '#ffd700', '#fffacd', '#ffeb3b'];
+                star.style.color = colors[Math.floor(Math.random() * colors.length)];
+
+                // 初期位置（マウス位置を中心に少しばらけさせる）
+                const offsetX = (Math.random() - 0.5) * 20;
+                const offsetY = (Math.random() - 0.5) * 20;
+                star.style.left = (x + offsetX) + 'px';
+                star.style.top = (y + offsetY) + 'px';
+
+                // サイズ
+                const size = 10 + Math.random() * 20; // 10px ~ 30px
+                star.style.fontSize = size + 'px';
+
+                // 飛んでいく方向 (CSS変数へ渡す)
+                const tx = (Math.random() - 0.5) * 100 + 'px'; // -50px ~ 50px
+                const ty = (Math.random() - 0.5) * 100 + 'px';
+                star.style.setProperty('--tx', tx);
+                star.style.setProperty('--ty', ty);
+
+                document.body.appendChild(star);
+
+                // アニメーション終了後に削除 (3s = 3000ms)
+                setTimeout(() => {
+                    star.remove();
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+
+</html>
