@@ -55,8 +55,8 @@
 
         tree {
             position: relative;
-            /* ツリーサイズさらに拡大 */
-            height: 80vmin;
+            /* ツリーサイズ調整: 高さを抑えて幅広に */
+            height: 65vmin;
             width: 45vmin;
             transform-style: preserve-3d;
             display: block;
@@ -205,38 +205,35 @@
             }
         }
 
-        /* 水滴ライト: 色を元（白）に戻す、will-change削除済み */
-        .rain-drop {
+        /* 雪の結晶 */
+        .snowflake {
             position: absolute;
-            top: -15vh;
-            /* 画面外からスタート */
-            width: 2px;
-            height: 15vh;
-            /* 白に戻す */
-            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9));
-            animation: fall linear infinite;
+            top: -10vh;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            user-select: none;
             pointer-events: none;
             z-index: 20;
-            /* ツリーより手前、文字より奥 */
-            opacity: 0;
+            /* ツリーより手前 */
+            animation: snowfall linear infinite;
         }
 
-        @keyframes fall {
+        @keyframes snowfall {
             0% {
-                transform: translateY(0);
+                transform: translateY(0) rotate(0deg);
                 opacity: 0;
             }
 
             10% {
-                opacity: 1;
+                opacity: 0.9;
             }
 
             90% {
-                opacity: 1;
+                opacity: 0.9;
             }
 
             100% {
-                transform: translateY(120vh);
+                transform: translateY(110vh) rotate(360deg);
                 opacity: 0;
             }
         }
@@ -271,8 +268,9 @@
     <div class="message-container">
         <!-- viewBox広め、文字は中央配置（全幅なので中央でOK） -->
         <svg class="handwriting-svg" viewBox="0 0 600 100">
-            <!-- 金色のグラデーション定義 -->
+            <!-- グラデーション定義 -->
             <defs>
+                <!-- 文字・星枠線用 -->
                 <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stop-color="#BF953F" />
                     <stop offset="25%" stop-color="#FCF6BA" />
@@ -296,8 +294,9 @@
         const LIGHT_COUNT = 80;
         const TURNS = 3;
         const MIN_RADIUS = 1.2;
-        const MAX_RADIUS = 8;
+        const MAX_RADIUS = 17;
 
+        // ライト生成
         for (let i = 0; i < LIGHT_COUNT; i++) {
             const light = document.createElement("div");
             light.className = "tree__light";
@@ -358,28 +357,32 @@
             document.body.appendChild(s);
         }
 
-        // 水滴ライト (Rain Lights) - 数は前回28個になってるので維持
-        const RAIN_COUNT = 28;
+        // 雪の結晶 (Snowflakes) - ゆっくり落ちる
+        const SNOW_COUNT = 30;
+        const snowChars = ['\u2744', '\u2745', '\u2746']; // ❄, ❅, ❆
 
-        for (let i = 0; i < RAIN_COUNT; i++) {
-            const drop = document.createElement("div");
-            drop.className = "rain-drop";
+        for (let i = 0; i < SNOW_COUNT; i++) {
+            const flake = document.createElement("div");
+            flake.className = "snowflake";
+
+            // 雪の文字をランダムに選択
+            flake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
 
             // X座標はランダム
-            drop.style.left = Math.random() * 100 + "%";
+            flake.style.left = Math.random() * 100 + "%";
 
-            // アニメーション時間と遅延をランダムにして自然な不規則さを出す
-            const duration = 2 + Math.random() * 3; // 2〜5秒
-            const delay = Math.random() * 5; // 0〜5秒
+            // サイズをランダムに (1.5vmin ~ 3.5vmin)
+            const size = 1.5 + Math.random() * 2;
+            flake.style.fontSize = `${size}vmin`;
 
-            drop.style.animationDuration = `${duration}s`;
-            drop.style.animationDelay = `${delay}s`;
+            // アニメーション時間 (遅く: 5s〜10s)
+            const duration = 5 + Math.random() * 5;
+            const delay = Math.random() * 5;
 
-            // 長さも少しランダムに
-            const height = 10 + Math.random() * 10; // 10vh〜20vh
-            drop.style.height = `${height}vh`;
+            flake.style.animationDuration = `${duration}s`;
+            flake.style.animationDelay = `${delay}s`;
 
-            document.body.appendChild(drop);
+            document.body.appendChild(flake);
         }
     </script>
 </body>
