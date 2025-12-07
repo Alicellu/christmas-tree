@@ -184,9 +184,13 @@
 
         .four-point-star-bg {
             position: absolute;
-            background: white;
-            clip-path: polygon(50% 0%, 65% 40%, 100% 50%, 65% 60%, 50% 100%, 35% 60%, 0% 50%, 35% 40%);
-            opacity: 0.8;
+            background: linear-gradient(135deg, #ffffff, #c0c0c0);
+            /* シルバーっぽく */
+            /* 下が細長い形状: 重心を上にずらす */
+            clip-path: polygon(50% 0%, 55% 35%, 100% 40%, 55% 45%, 50% 100%, 45% 45%, 0% 40%, 45% 35%);
+            opacity: 0.9;
+            /* 本格的な輝きを追加 */
+            filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 10px rgba(255, 255, 255, 0.4));
             animation: tinyBlink 3s infinite ease-in-out;
             z-index: 0;
         }
@@ -333,8 +337,7 @@
 
             if (isFourPoint) {
                 s.className = "four-point-star-bg";
-                const hue = Math.floor(Math.random() * 360);
-                s.style.background = `hsl(${hue}, 80%, 70%)`;
+                s.style.background = "white"; // 白のみにする
                 // サイズランダム（大・小混ぜる）
                 size = 0.5 + Math.random() * 2.5;
             } else {
@@ -371,8 +374,8 @@
             // X座標はランダム
             flake.style.left = Math.random() * 100 + "%";
 
-            // サイズをランダムに (1.5vmin ~ 3.5vmin)
-            const size = 1.5 + Math.random() * 2;
+            // サイズをランダムに (大きく: 2vmin ~ 10vmin) -> 最大サイズを約3倍に
+            const size = 2 + Math.random() * 8;
             flake.style.fontSize = `${size}vmin`;
 
             // アニメーション時間 (遅く: 5s〜10s)
