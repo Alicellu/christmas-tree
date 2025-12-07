@@ -23,14 +23,31 @@
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            /* スクロール防止 */
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            position: relative;
+            /* 星の基準 */
+        }
+
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* 画面いっぱいまで拡大 */
+            width: 100vmin;
+            height: 100vmin;
+            position: relative;
+            z-index: 10;
+            /* 星より手前 */
         }
 
         .scene {
             perspective: 90vmin;
             position: relative;
-            width: min(60vmin, 360px);
-            height: min(90vmin, 540px);
+            width: 100%;
+            height: 100%;
+            /* 親に合わせて最大化 */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -38,11 +55,16 @@
 
         tree {
             position: relative;
-            height: 50vmin;
-            width: 25vmin;
+            /* ツリーサイズさらに拡大 */
+            height: 80vmin;
+            width: 45vmin;
             transform-style: preserve-3d;
             display: block;
             animation: spin 2.5s infinite linear;
+            margin-top: -5vmin;
+            /* 少し調整 */
+            will-change: transform;
+            /* パフォーマンス最適化 */
         }
 
         @keyframes spin {
@@ -60,14 +82,15 @@
             position: absolute;
             top: 0;
             left: 50%;
-            transform: translate(-50%, -70%);
-            width: 6vmin;
-            height: 6vmin;
+            transform: translate(-50%, -60%);
+            width: 12vmin;
+            /* さらに拡大 */
+            height: 12vmin;
             display: flex;
             justify-content: center;
             align-items: center;
-            filter:
-                drop-shadow(0 0 1px #ffe66d) drop-shadow(0 0 4px #ffe66d);
+            /* ドロップシャドウも金色系に */
+            filter: drop-shadow(0 0 1px #e6c200) drop-shadow(0 0 4px #e6c200);
         }
 
         .star__svg {
@@ -80,18 +103,21 @@
             position: absolute;
             left: 50%;
             transform-style: preserve-3d;
-            height: 0.7vmin;
-            width: 0.7vmin;
+            height: 1.4vmin;
+            /* さらに拡大 */
+            width: 1.4vmin;
             border-radius: 50%;
             background: radial-gradient(circle, #ffffff, #ff1744);
             box-shadow:
-                0 0 3px #ff1744,
-                0 0 6px #ff1744;
+                0 0 2px #ff1744,
+                0 0 4px #ff1744;
+            /* 負荷軽減のため縮小 */
             top: calc(var(--y, 0) * 1%);
             transform:
                 translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
             animation: blink 2s infinite ease-in-out;
             animation-delay: var(--delay, 0s);
+            /* will-change削除: モバイルでのメモリ負荷軽減 */
         }
 
         @keyframes blink {
@@ -107,18 +133,20 @@
         }
 
         /* 手書き風文字のアニメーションコンテナ */
+        /* body直下に配置し、画面全幅を使う */
         .message-container {
             position: absolute;
-            bottom: 2vmin;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80vmin;
-            /* 幅を広めに確保 */
-            height: 15vmin;
+            bottom: 8vmin;
+            left: 0;
+            width: 100%;
+            /* 画面幅いっぱい */
+            height: 25vmin;
             pointer-events: none;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end;
+            /* 下揃え */
+            z-index: 1000;
         }
 
         /* SVGテキストの設定 */
@@ -130,48 +158,19 @@
 
         .handwriting-text {
             font-family: 'Great Vibes', cursive;
-            /* 手書き風フォント */
-            font-size: 50px;
-            fill: transparent;
-            /* 最初は中身透明 */
-            stroke: url(#goldGradient);
-            /* 輪郭を金色のグラデーションで描く */
-            stroke-width: 1.5px;
-            stroke-dasharray: 1000;
-            /* 線の長さ（十分に長く） */
-            stroke-dashoffset: 1000;
-            /* 最初は隠しておく */
-            animation:
-                draw 4s ease-out forwards,
-                /* 線を描くアニメーション */
-                fill-in 2s ease-in-out 3s forwards;
-            /* 中身を塗るアニメーション（少し遅れて開始） */
-
-            /* 光彩（グロー）効果 */
+            font-size: 60px;
+            fill: url(#goldGradient);
+            fill-opacity: 1;
+            /* 最初から表示 */
+            stroke: none;
+            /* ストロークなし */
             filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
+            /* アニメーション削除 */
         }
 
-        /* 線を描く */
-        @keyframes draw {
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-
-        /* 中身を金色で満たす */
-        @keyframes fill-in {
-            to {
-                fill: url(#goldGradient);
-                stroke-width: 0;
-                /* 塗りつぶしたら線は消す（または細くする） */
-            }
-        }
-
-        /* 小さな星 */
-        .tiny-star {
+        /* 背景の星（ランダム配置用） */
+        .bg-star {
             position: absolute;
-            width: 0.6vmin;
-            height: 0.6vmin;
             border-radius: 50%;
             background: #ffffff;
             box-shadow:
@@ -179,15 +178,17 @@
                 0 0 4px rgba(255, 255, 255, 0.8);
             opacity: 0.7;
             animation: tinyBlink 3s infinite ease-in-out;
+            z-index: 0;
+            /* 最背面 */
         }
 
-        /* 4角の星 */
-        .four-point-star {
+        .four-point-star-bg {
             position: absolute;
             background: white;
             clip-path: polygon(50% 0%, 65% 40%, 100% 50%, 65% 60%, 50% 100%, 35% 60%, 0% 50%, 35% 40%);
             opacity: 0.8;
             animation: tinyBlink 3s infinite ease-in-out;
+            z-index: 0;
         }
 
         @keyframes tinyBlink {
@@ -195,48 +196,97 @@
             0%,
             100% {
                 opacity: 0.2;
-                transform: scale(0.8);
+                transform: scale(0.6);
             }
 
             50% {
                 opacity: 1;
-                transform: scale(1.1);
+                transform: scale(1.2);
+            }
+        }
+
+        /* 水滴ライト: 色を元（白）に戻す、will-change削除済み */
+        .rain-drop {
+            position: absolute;
+            top: -15vh;
+            /* 画面外からスタート */
+            width: 2px;
+            height: 15vh;
+            /* 白に戻す */
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9));
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 20;
+            /* ツリーより手前、文字より奥 */
+            opacity: 0;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(120vh);
+                opacity: 0;
             }
         }
     </style>
+</head>
 
 <body>
-    <div class="scene">
-        <tree id="tree">
-            <!-- 星 -->
-            <div class="star">
-                <svg class="star__svg" viewBox="0 0 100 100">
-                    <polygon points="50,5 61,35 95,38 68,59 76,91 50,73 24,91 32,59 5,38 39,35" fill="none"
-                        stroke="#ffe66d" stroke-width="5" stroke-linejoin="round" />
-                </svg>
-            </div>
-        </tree>
-
-        <!-- 手書き風文字 (SVG) -->
-        <div class="message-container">
-            <svg class="handwriting-svg" viewBox="0 0 400 100">
-                <!-- 金色のグラデーション定義 -->
-                <defs>
-                    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                        <stop offset="0%" stop-color="#BF953F" />
-                        <stop offset="25%" stop-color="#FCF6BA" />
-                        <stop offset="50%" stop-color="#B38728" />
-                        <stop offset="75%" stop-color="#FBF5B7" />
-                        <stop offset="100%" stop-color="#AA771C" />
-                    </linearGradient>
-                </defs>
-
-                <!-- テキスト本体 -->
-                <text x="50%" y="65%" text-anchor="middle" class="handwriting-text">
-                    2025 Merry Christmas
-                </text>
-            </svg>
+    <div class="main-wrapper">
+        <div class="scene">
+            <tree id="tree">
+                <!-- 星: 枠線のみ -->
+                <div class="star">
+                    <svg class="star__svg" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="starStrokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#BF953F" />
+                                <stop offset="25%" stop-color="#FCF6BA" />
+                                <stop offset="50%" stop-color="#B38728" />
+                                <stop offset="75%" stop-color="#FBF5B7" />
+                                <stop offset="100%" stop-color="#AA771C" />
+                            </linearGradient>
+                        </defs>
+                        <polygon points="50,5 61,35 95,38 68,59 76,91 50,73 24,91 32,59 5,38 39,35" fill="none"
+                            stroke="url(#starStrokeGradient)" stroke-width="5" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </tree>
         </div>
+    </div>
+
+    <!-- 手書き風文字 (SVG) - main-wrapperの外に出して全幅確保 -->
+    <div class="message-container">
+        <!-- viewBox広め、文字は中央配置（全幅なので中央でOK） -->
+        <svg class="handwriting-svg" viewBox="0 0 600 100">
+            <!-- 金色のグラデーション定義 -->
+            <defs>
+                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#BF953F" />
+                    <stop offset="25%" stop-color="#FCF6BA" />
+                    <stop offset="50%" stop-color="#B38728" />
+                    <stop offset="75%" stop-color="#FBF5B7" />
+                    <stop offset="100%" stop-color="#AA771C" />
+                </linearGradient>
+            </defs>
+
+            <!-- テキスト本体 -->
+            <text x="50%" y="70%" text-anchor="middle" class="handwriting-text">
+                2025 Merry Christmas
+            </text>
+        </svg>
     </div>
 
     <script>
@@ -274,35 +324,62 @@
             tree.appendChild(light);
         }
 
-        // 背景の星
-        const scene = document.querySelector(".scene");
-        const STAR_COUNT = 40;
+        // 背景の星（全画面ランダム）- さらに20%減 (100 -> 80)
+        const STAR_COUNT = 80;
 
         for (let i = 0; i < STAR_COUNT; i++) {
             const s = document.createElement("div");
-
             const isFourPoint = Math.random() > 0.4;
+            let size;
 
             if (isFourPoint) {
-                s.className = "four-point-star";
+                s.className = "four-point-star-bg";
                 const hue = Math.floor(Math.random() * 360);
                 s.style.background = `hsl(${hue}, 80%, 70%)`;
-                const size = 0.8 + Math.random() * 1.2;
-                s.style.width = `${size}vmin`;
-                s.style.height = `${size}vmin`;
+                // サイズランダム（大・小混ぜる）
+                size = 0.5 + Math.random() * 2.5;
             } else {
-                s.className = "tiny-star";
+                s.className = "bg-star";
+                size = 0.3 + Math.random() * 1.5;
             }
 
-            // 横幅を文字幅に合わせる (大体 30% 〜 70% の範囲に収める)
-            const x = 30 + Math.random() * 40;
-            const y = 20 + Math.random() * 75;
+            s.style.width = `${size}vmin`;
+            s.style.height = `${size}vmin`;
+
+            // 画面全体に配置 (0-100%)
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
 
             s.style.left = `${x}%`;
             s.style.top = `${y}%`;
             s.style.animationDelay = `${Math.random() * 3}s`;
 
-            scene.appendChild(s);
+            // bodyに追加
+            document.body.appendChild(s);
+        }
+
+        // 水滴ライト (Rain Lights) - 数は前回28個になってるので維持
+        const RAIN_COUNT = 28;
+
+        for (let i = 0; i < RAIN_COUNT; i++) {
+            const drop = document.createElement("div");
+            drop.className = "rain-drop";
+
+            // X座標はランダム
+            drop.style.left = Math.random() * 100 + "%";
+
+            // アニメーション時間と遅延をランダムにして自然な不規則さを出す
+            const duration = 2 + Math.random() * 3; // 2〜5秒
+            const delay = Math.random() * 5; // 0〜5秒
+
+            drop.style.animationDuration = `${duration}s`;
+            drop.style.animationDelay = `${delay}s`;
+
+            // 長さも少しランダムに
+            const height = 10 + Math.random() * 10; // 10vh〜20vh
+            drop.style.height = `${height}vh`;
+
+            document.body.appendChild(drop);
         }
     </script>
 </body>
