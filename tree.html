@@ -609,7 +609,7 @@
                 border-radius: 50%;
                 background: white;
                 box-shadow: 0 0 4px white, 0 0 8px #afeeee;
-                animation: fairy-dust-fade 1.5s forwards ease-out;
+                animation: fairy-dust-fade 4s forwards ease-out; /* 1.5s -> 4s (倍以上) */
                 will-change: transform, opacity;
             }
 
@@ -626,27 +626,66 @@
         `;
         document.head.appendChild(sparkleStyle);
 
+        let mouseX = 0;
+        let mouseY = 0;
+        let isCursorVisible = false;
+
         document.addEventListener('mousemove', (e) => {
-            updateCursorHolly(e.clientX, e.clientY);
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!isCursorVisible) {
+                isCursorVisible = true;
+                cursorHolly.style.display = "block";
+            }
             createFairyDust(e.clientX, e.clientY);
         });
+
         document.addEventListener('touchmove', (e) => {
             const touch = e.touches[0];
-            updateCursorHolly(touch.clientX, touch.clientY);
+            mouseX = touch.clientX;
+            mouseY = touch.clientY;
+            if (!isCursorVisible) {
+                isCursorVisible = true;
+                cursorHolly.style.display = "block";
+            }
             createFairyDust(touch.clientX, touch.clientY);
-        });
+        }, { passive: true }); // passiveオプションでスクロール性能向上
 
-        // マウス位置にヒイラギを追従させる
+        // Loop for smooth animation (Wave motion & Performance)
+        function animate() {
+            if (isCursorVisible) {
+                updateCursorHolly(mouseX, mouseY);
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // マウス位置にヒイラギを追従させる + 波のような動き
         function updateCursorHolly(x, y) {
-            cursorHolly.style.display = "block";
-            cursorHolly.style.left = x + "px";
-            cursorHolly.style.top = y + "px";
+            // left/topではなくtransformを使うことでパフォーマンス改善
+            // 波の動き: 時間経過でゆらゆらさせる
+            const time = Date.now();
+            const sway = Math.sin(time * 0.003) * 15; // ±15度の回転
+            const bob = Math.sin(time * 0.005) * 5;   // 上下5pxの浮遊感
+
+            // 元のCSSにある translate(-50%, -50%) scale(1.1) を維持しつつ、位置指定と揺れを追加
+            cursorHolly.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) scale(1.1) translateY(${bob}px) rotate(${sway}deg)`;
+
+            // left/topはリセット（CSSで0になっているが念のため上書きしないようにstyle操作は削除）
+            // cursorHolly.style.left = ... (不要)
         }
 
+        let lastDustTime = 0;
+
         function createFairyDust(x, y) {
+            // スロットリング: 生成頻度を制限して負荷を下げる (50msに1回など)
+            const now = Date.now();
+            if (now - lastDustTime < 50) return;
+            lastDustTime = now;
+
             if (Math.random() < 0.1) return;
 
-            const count = 3;
+            const count = 2; // 一度に生成する数を少し減らして負荷軽減 (3 -> 2)
 
             for (let i = 0; i < count; i++) {
                 const star = document.createElement('div');
@@ -675,9 +714,10 @@
 
                 document.body.appendChild(star);
 
+                // 時間延長に合わせて削除タイミングも変更 (4s)
                 setTimeout(() => {
-                    star.remove();
-                }, 1500);
+                    if (star.parentNode) star.parentNode.removeChild(star);
+                }, 4000);
             }
         }
     </script>
