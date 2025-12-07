@@ -27,6 +27,8 @@
             font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
             position: relative;
             /* 星の基準 */
+            cursor: none;
+            /* デフォルトカーソルを非表示 */
         }
 
         .main-wrapper {
@@ -55,7 +57,7 @@
 
         tree {
             position: relative;
-            /* ツリーサイズ調整: 高さを抑えて幅広に */
+            /* ツリーサイズさらに拡大 */
             height: 65vmin;
             width: 45vmin;
             transform-style: preserve-3d;
@@ -83,14 +85,14 @@
             top: 0;
             left: 50%;
             transform: translate(-50%, -60%);
-            width: 12vmin;
-            /* さらに拡大 */
-            height: 12vmin;
+            width: 6vmin;
+            /* 9vmin -> 6vmin に縮小 */
+            height: 6vmin;
             display: flex;
             justify-content: center;
             align-items: center;
-            /* ドロップシャドウも金色系に */
-            filter: drop-shadow(0 0 1px #e6c200) drop-shadow(0 0 4px #e6c200);
+            /* 光彩大幅UP: 白と金の強い輝き */
+            filter: drop-shadow(0 0 5px #ffd700) drop-shadow(0 0 15px #e6c200) drop-shadow(0 0 30px rgba(255, 215, 0, 0.4));
         }
 
         .star__svg {
@@ -98,58 +100,59 @@
             height: 100%;
         }
 
-        /* ライト */
+        /* ライト: 上品なシャンパンゴールドでくっきり */
         .tree__light {
             position: absolute;
             left: 50%;
             transform-style: preserve-3d;
             height: 1.4vmin;
-            /* さらに拡大 */
             width: 1.4vmin;
             border-radius: 50%;
-            background: radial-gradient(circle, #ffffff, #ff1744);
+            /* 芯は白く、周囲に上品なゴールド */
+            background: radial-gradient(circle at 30% 30%, #ffffff, #f7e7ce);
+            /* くっきりさせる: ぼかしを小さく、しかし光は強く */
             box-shadow:
-                0 0 2px #ff1744,
-                0 0 4px #ff1744;
-            /* 負荷軽減のため縮小 */
+                0 0 2px 0px #ffffff,
+                0 0 6px 1px rgba(255, 223, 0, 0.6);
             top: calc(var(--y, 0) * 1%);
             transform:
                 translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
-            animation: blink 2s infinite ease-in-out;
+            animation: blink 3s infinite ease-in-out;
             animation-delay: var(--delay, 0s);
-            /* will-change削除: モバイルでのメモリ負荷軽減 */
         }
 
         @keyframes blink {
 
             0%,
             100% {
-                opacity: 0.5;
+                opacity: 0.6;
+                /* 完全に消さない */
+                transform: translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin)) scale(0.9);
             }
 
             50% {
                 opacity: 1;
+                transform: translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin)) scale(1.1);
             }
         }
 
-        /* 手書き風文字のアニメーションコンテナ */
-        /* body直下に配置し、画面全幅を使う */
+
+
+
+        /* 手書き風文字コンテナ (アニメーションなし・静止画表示) */
         .message-container {
             position: absolute;
             bottom: 8vmin;
             left: 0;
             width: 100%;
-            /* 画面幅いっぱい */
             height: 25vmin;
             pointer-events: none;
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            /* 下揃え */
             z-index: 1000;
         }
 
-        /* SVGテキストの設定 */
         .handwriting-svg {
             width: 100%;
             height: 100%;
@@ -159,24 +162,28 @@
         .handwriting-text {
             font-family: 'Great Vibes', cursive;
             font-size: 60px;
+
+            /* グラデーションで塗りつぶし（最初から表示） */
             fill: url(#goldGradient);
             fill-opacity: 1;
-            /* 最初から表示 */
-            stroke: none;
-            /* ストロークなし */
+
+            /* 縁取りも表示 */
+            stroke: url(#goldGradient);
+            stroke-width: 1.5px;
+
+            stroke-dasharray: 0;
+            stroke-dashoffset: 0;
+
             filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
-            /* アニメーション削除 */
         }
 
         /* 背景の星（ランダム配置用） */
         .bg-star {
             position: absolute;
             border-radius: 50%;
+            /* backgroundとbox-shadowはJSで個別設定 */
             background: #ffffff;
-            box-shadow:
-                0 0 2px rgba(255, 255, 255, 0.9),
-                0 0 4px rgba(255, 255, 255, 0.8);
-            opacity: 0.7;
+            opacity: 0.9;
             animation: tinyBlink 3s infinite ease-in-out;
             z-index: 0;
             /* 最背面 */
@@ -185,8 +192,10 @@
         .four-point-star-bg {
             position: absolute;
             background: white;
-            clip-path: polygon(50% 0%, 65% 40%, 100% 50%, 65% 60%, 50% 100%, 35% 60%, 0% 50%, 35% 40%);
-            opacity: 0.8;
+            clip-path: polygon(50% 0%, 55% 35%, 100% 40%, 55% 45%, 50% 100%, 45% 45%, 0% 40%, 45% 35%);
+            opacity: 1;
+            /* 強力な輝きを追加 */
+            filter: drop-shadow(0 0 4px rgba(255, 255, 255, 1)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.6));
             animation: tinyBlink 3s infinite ease-in-out;
             z-index: 0;
         }
@@ -195,13 +204,48 @@
 
             0%,
             100% {
-                opacity: 0.2;
+                opacity: 0.4;
                 transform: scale(0.6);
             }
 
             50% {
                 opacity: 1;
-                transform: scale(1.2);
+                transform: scale(1.4);
+                /* 瞬きを強調 */
+            }
+        }
+
+        /* 水滴ライト */
+        .rain-drop {
+            position: absolute;
+            top: -15vh;
+            /* 画面外からスタート */
+            width: 2px;
+            height: 15vh;
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 20;
+            /* ツリーより手前、文字より奥 */
+            opacity: 0;
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(0);
+                opacity: 0;
+            }
+
+            10% {
+                opacity: 1;
+            }
+
+            90% {
+                opacity: 1;
+            }
+
+            100% {
+                transform: translateY(120vh);
+                opacity: 0;
             }
         }
 
@@ -209,12 +253,10 @@
         .snowflake {
             position: absolute;
             top: -10vh;
-            color: rgba(255, 255, 255, 0.9);
-            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+            /* color, text-shadowはJSで指定 */
             user-select: none;
             pointer-events: none;
             z-index: 20;
-            /* ツリーより手前 */
             animation: snowfall linear infinite;
         }
 
@@ -237,10 +279,97 @@
                 opacity: 0;
             }
         }
+
+        /* ヒイラギ: 指定サイズ 4.5vmin */
+        .tree__holly {
+            position: absolute;
+            left: 50%;
+            transform-style: preserve-3d;
+            width: 4.5vmin;
+            height: 4.5vmin;
+            top: calc(var(--y, 0) * 1%);
+            transform:
+                translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
+        }
+
+        /* マウス追従ヒイラギ (マウスストーカー) */
+        #cursor-holly {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 3.5vmin;
+            /* サイズ少し拡大 */
+            height: 3.5vmin;
+            pointer-events: none;
+            z-index: 10000;
+            /* 最前面 */
+            display: none;
+            /* 初期は非表示 */
+            /* 中心をマウス位置に */
+            transform: translate(-50%, -50%) scale(1.1);
+            /* 少し目立たせる */
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.3));
+            will-change: left, top;
+        }
     </style>
 </head>
 
 <body>
+    <!-- マウス追従ヒイラギ (SVG) -->
+    <div id="cursor-holly">
+        <svg viewBox="0 0 100 100"
+            style="width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));">
+            <defs>
+                <linearGradient id="cursorLeafGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#2e8b57" />
+                    <!-- 海のような深い緑 -->
+                    <stop offset="50%" stop-color="#006400" />
+                    <stop offset="100%" stop-color="#004d00" />
+                </linearGradient>
+                <!-- 光沢用のハイライト -->
+                <linearGradient id="shine" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.15)" />
+                    <stop offset="50%" stop-color="rgba(255,255,255,0)" />
+                    <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+                </linearGradient>
+            </defs>
+            <!-- 葉っぱ2枚 (V字配置：内角150度) -->
+            <g transform="translate(50, 50)">
+                <!-- 1枚目: 左上へ (195度) -->
+                <g transform="translate(-5, 5) rotate(195)">
+                    <path
+                        d="M0,0 C5,-10 15,-5 20,-15 C22,-8 30,-5 35,-12 C34,-2 40,5 45,0 C42,10 40,20 30,25 C35,30 25,35 20,40 C15,30 5,35 0,25 C-5,35 -15,30 -20,40 C-25,35 -35,30 -30,25 C-40,20 -42,10 -45,0 C-40,5 -34,-2 -35,-12 C-30,-5 -22,-8 -20,-15 C-15,-5 -5,-10 0,0 Z"
+                        fill="url(#cursorLeafGrad)" stroke="#aaffaa" stroke-width="0.5"
+                        transform="scale(1.3, 0.45) translate(0, -10)" />
+                    <!-- 葉脈のような光沢 -->
+                    <path d="M0,-20 L0,20" stroke="url(#shine)" stroke-width="2" transform="rotate(0)" />
+                </g>
+                <!-- 2枚目: 右上へ (-15度) -->
+                <g transform="translate(5, 5) rotate(-15)">
+                    <path
+                        d="M0,0 C5,-10 15,-5 20,-15 C22,-8 30,-5 35,-12 C34,-2 40,5 45,0 C42,10 40,20 30,25 C35,30 25,35 20,40 C15,30 5,35 0,25 C-5,35 -15,30 -20,40 C-25,35 -35,30 -30,25 C-40,20 -42,10 -45,0 C-40,5 -34,-2 -35,-12 C-30,-5 -22,-8 -20,-15 C-15,-5 -5,-10 0,0 Z"
+                        fill="url(#cursorLeafGrad)" stroke="#aaffaa" stroke-width="0.5"
+                        transform="scale(1.3, 0.45) translate(0, -10)" />
+                    <path d="M0,-20 L0,20" stroke="url(#shine)" stroke-width="2" transform="rotate(0)" />
+                </g>
+            </g>
+
+            <!-- 赤い実 (3つ) - 大きくバラバラに -->
+            <g transform="translate(50, 50)">
+                <!-- 中央の実 -->
+                <circle cx="0" cy="0" r="12" fill="#d00" />
+                <!-- 左右の実 -->
+                <circle cx="-10" cy="6" r="10" fill="#b00" />
+                <circle cx="10" cy="6" r="11.5" fill="#b00" />
+
+                <!-- 実のハイライト -->
+                <circle cx="-2" cy="-3" r="4" fill="white" opacity="0.8" />
+                <circle cx="-12" cy="4" r="3" fill="white" opacity="0.6" />
+                <circle cx="8" cy="4" r="3" fill="white" opacity="0.6" />
+            </g>
+        </svg>
+    </div>
+
     <div class="main-wrapper">
         <div class="scene">
             <tree id="tree">
@@ -264,13 +393,12 @@
         </div>
     </div>
 
-    <!-- 手書き風文字 (SVG) - main-wrapperの外に出して全幅確保 -->
+
+
+    <!-- 手書き風文字 (SVG) - 静止画として表示 -->
     <div class="message-container">
-        <!-- viewBox広め、文字は中央配置（全幅なので中央でOK） -->
         <svg class="handwriting-svg" viewBox="0 0 600 100">
-            <!-- グラデーション定義 -->
             <defs>
-                <!-- 文字・星枠線用 -->
                 <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stop-color="#BF953F" />
                     <stop offset="25%" stop-color="#FCF6BA" />
@@ -280,7 +408,6 @@
                 </linearGradient>
             </defs>
 
-            <!-- テキスト本体 -->
             <text x="50%" y="70%" text-anchor="middle" class="handwriting-text">
                 2025 Merry Christmas
             </text>
@@ -289,6 +416,7 @@
 
     <script>
         const tree = document.getElementById("tree");
+        const cursorHolly = document.getElementById("cursor-holly");
 
         // ライト設定
         const LIGHT_COUNT = 80;
@@ -296,34 +424,91 @@
         const MIN_RADIUS = 1.2;
         const MAX_RADIUS = 17;
 
-        // ライト生成
+        // ヒイラギの位置を固定: 上部(0)、中段(40)、下部2番目(78)
+        const hollyIndices = new Set([0, 40, 78]);
+
         for (let i = 0; i < LIGHT_COUNT; i++) {
-            const light = document.createElement("div");
-            light.className = "tree__light";
-
             const t = i / (LIGHT_COUNT - 1);
-
             const y = 6 + t * 86;
             const rotate = t * 360 * TURNS;
             const radius = MIN_RADIUS * (1 - t) + MAX_RADIUS * t;
             const delay = Math.random() * 2;
 
-            light.style.setProperty("--y", y);
-            light.style.setProperty("--rotate", rotate);
-            light.style.setProperty("--radius", radius);
-            light.style.setProperty("--delay", `${delay}s`);
+            if (hollyIndices.has(i)) {
+                // 上品なヒイラギ (Holly)
+                const holly = document.createElement("div");
+                holly.className = "tree__holly";
+                // SVG定義 - 小さくても視認できるよう調整
+                holly.style.width = "3.5vmin"; // サイズ少し拡大
+                holly.style.height = "3.5vmin";
 
-            // 白い光の設定
-            if (Math.random() > 0.5) {
-                light.style.background = "radial-gradient(circle, #ffffff, #ffffff)";
-                light.style.boxShadow =
-                    "0 0 3px #ffffff, 0 0 6px #ffffff";
+                holly.innerHTML = `
+                <svg viewBox="0 0 100 100" style="width:100%;height:100%;overflow:visible;filter:drop-shadow(0 0 2px rgba(255, 255, 255, 0.3));">
+                    <defs>
+                        <linearGradient id="leafGrad${i}" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#2e8b57"/>
+                            <stop offset="50%" stop-color="#006400"/>
+                             <stop offset="100%" stop-color="#004d00" />
+                        </linearGradient>
+                         <linearGradient id="shine${i}" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="rgba(255,255,255,0.15)" />
+                            <stop offset="50%" stop-color="rgba(255,255,255,0)" />
+                            <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <g transform="translate(50, 50)">
+                         <!-- 1枚目: 左上へ (195度) -->
+                        <g transform="translate(-5, 5) rotate(195)">
+                             <path d="M0,0 C5,-10 15,-5 20,-15 C22,-8 30,-5 35,-12 C34,-2 40,5 45,0 C42,10 40,20 30,25 C35,30 25,35 20,40 C15,30 5,35 0,25 C-5,35 -15,30 -20,40 C-25,35 -35,30 -30,25 C-40,20 -42,10 -45,0 C-40,5 -34,-2 -35,-12 C-30,-5 -22,-8 -20,-15 C-15,-5 -5,-10 0,0 Z"
+                                fill="url(#leafGrad${i})" stroke="#aaffaa" stroke-width="0.5" transform="scale(1.3, 0.45) translate(0, -10)"/>
+                             <!-- 葉脈のような光沢 -->
+                             <path d="M0,-20 L0,20" stroke="url(#shine${i})" stroke-width="2" />
+                        </g>
+                         <!-- 2枚目: 右上へ (-15度) -->
+                        <g transform="translate(5, 5) rotate(-15)">
+                             <path d="M0,0 C5,-10 15,-5 20,-15 C22,-8 30,-5 35,-12 C34,-2 40,5 45,0 C42,10 40,20 30,25 C35,30 25,35 20,40 C15,30 5,35 0,25 C-5,35 -15,30 -20,40 C-25,35 -35,30 -30,25 C-40,20 -42,10 -45,0 C-40,5 -34,-2 -35,-12 C-30,-5 -22,-8 -20,-15 C-15,-5 -5,-10 0,0 Z"
+                                fill="url(#leafGrad${i})" stroke="#aaffaa" stroke-width="0.5" transform="scale(1.3, 0.45) translate(0, -10)"/>
+                             <path d="M0,-20 L0,20" stroke="url(#shine${i})" stroke-width="2" />
+                        </g>
+                    </g>
+                    
+                    <!-- 赤い実 (3つ) - 大きくバラバラに -->
+                    <g transform="translate(50, 50)">
+                         <!-- 中央の実 -->
+                        <circle cx="0" cy="0" r="12" fill="#d00" />
+                        <!-- 左右の実 -->
+                        <circle cx="-10" cy="6" r="10" fill="#b00" />
+                        <circle cx="10" cy="6" r="11.5" fill="#b00" />
+                        <!-- 実のハイライト -->
+                        <circle cx="-2" cy="-3" r="4" fill="white" opacity="0.8" />
+                        <circle cx="-12" cy="4" r="3" fill="white" opacity="0.6" />
+                        <circle cx="8" cy="4" r="3" fill="white" opacity="0.6" />
+                    </g>
+                </svg>
+                `;
+
+                holly.style.setProperty("--y", y);
+                holly.style.setProperty("--rotate", rotate);
+                holly.style.setProperty("--radius", radius);
+
+                tree.appendChild(holly);
+
+            } else {
+                // 通常のライト
+                const light = document.createElement("div");
+                light.className = "tree__light";
+
+                light.style.setProperty("--y", y);
+                light.style.setProperty("--rotate", rotate);
+                light.style.setProperty("--radius", radius);
+                light.style.setProperty("--delay", `${delay}s`);
+
+                tree.appendChild(light);
             }
-
-            tree.appendChild(light);
         }
 
-        // 背景の星（全画面ランダム）- さらに20%減 (100 -> 80)
+        // 背景の星
         const STAR_COUNT = 80;
 
         for (let i = 0; i < STAR_COUNT; i++) {
@@ -335,17 +520,19 @@
                 s.className = "four-point-star-bg";
                 const hue = Math.floor(Math.random() * 360);
                 s.style.background = `hsl(${hue}, 80%, 70%)`;
-                // サイズランダム（大・小混ぜる）
                 size = 0.5 + Math.random() * 2.5;
             } else {
                 s.className = "bg-star";
                 size = 0.3 + Math.random() * 1.5;
+                const colors = ['#ffffff', '#afeeee', '#fffacd'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                s.style.background = color;
+                s.style.boxShadow = `0 0 3px ${color}, 0 0 6px ${color}`;
             }
 
             s.style.width = `${size}vmin`;
             s.style.height = `${size}vmin`;
 
-            // 画面全体に配置 (0-100%)
             const x = Math.random() * 100;
             const y = Math.random() * 100;
 
@@ -353,36 +540,175 @@
             s.style.top = `${y}%`;
             s.style.animationDelay = `${Math.random() * 3}s`;
 
-            // bodyに追加
             document.body.appendChild(s);
         }
 
-        // 雪の結晶 (Snowflakes) - ゆっくり落ちる
-        const SNOW_COUNT = 30;
+        // 落下要素（水滴と雪の混合）- 淡いブルー混合、柔らかく
+        const DROP_COUNT = 40;
         const snowChars = ['\u2744', '\u2745', '\u2746']; // ❄, ❅, ❆
+        const softBlueColors = [
+            '255, 255, 255',   // 白
+            '175, 238, 238', // PaleTurquoise
+            '224, 255, 255', // LightCyan
+            '173, 216, 230'  // LightBlue
+        ];
 
-        for (let i = 0; i < SNOW_COUNT; i++) {
-            const flake = document.createElement("div");
-            flake.className = "snowflake";
+        for (let i = 0; i < DROP_COUNT; i++) {
+            const isSnow = Math.random() > 0.5;
+            const el = document.createElement("div");
 
-            // 雪の文字をランダムに選択
-            flake.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
-
-            // X座標はランダム
-            flake.style.left = Math.random() * 100 + "%";
-
-            // サイズをランダムに (1.5vmin ~ 3.5vmin)
-            const size = 1.5 + Math.random() * 2;
-            flake.style.fontSize = `${size}vmin`;
-
-            // アニメーション時間 (遅く: 5s〜10s)
+            el.style.left = Math.random() * 100 + "%";
             const duration = 5 + Math.random() * 5;
             const delay = Math.random() * 5;
 
-            flake.style.animationDuration = `${duration}s`;
-            flake.style.animationDelay = `${delay}s`;
+            el.style.animationDuration = `${duration}s`;
+            el.style.animationDelay = `${delay}s`;
 
-            document.body.appendChild(flake);
+            const rgb = softBlueColors[Math.floor(Math.random() * softBlueColors.length)];
+
+            if (isSnow) {
+                el.className = "snowflake";
+                el.textContent = snowChars[Math.floor(Math.random() * snowChars.length)];
+                const size = 1.5 + Math.random() * 2;
+                el.style.fontSize = `${size}vmin`;
+
+                el.style.color = `rgba(${rgb}, 0.8)`;
+                el.style.textShadow = `0 0 5px rgba(${rgb}, 0.6)`;
+
+            } else {
+                el.className = "rain-drop";
+                const height = 10 + Math.random() * 10;
+                el.style.height = `${height}vh`;
+
+                el.style.background = `linear-gradient(to bottom, transparent, rgba(${rgb}, 0.8))`;
+            }
+
+            document.body.appendChild(el);
+        }
+
+        /* ----------------------------------------------------
+           マウス・タッチ操作の妖精の粉 (Fairy Dust Effect) & ヒイラギ
+           ---------------------------------------------------- */
+
+        const sparkleStyle = document.createElement("style");
+        sparkleStyle.textContent = `
+            .cursor-star {
+                position: absolute;
+                pointer-events: none;
+                z-index: 9999;
+                border-radius: 50%;
+                background: white;
+                box-shadow: 0 0 4px white, 0 0 8px #afeeee;
+                animation: fairy-dust-fade 4s forwards ease-out; /* 1.5s -> 4s (倍以上) */
+                will-change: transform, opacity;
+            }
+
+            @keyframes fairy-dust-fade {
+                0% {
+                    opacity: 1;
+                    transform: translate(0, 0) scale(1);
+                }
+                100% {
+                    opacity: 0;
+                    transform: translate(var(--tx), var(--ty)) scale(0);
+                }
+            }
+        `;
+        document.head.appendChild(sparkleStyle);
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let isCursorVisible = false;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            if (!isCursorVisible) {
+                isCursorVisible = true;
+                cursorHolly.style.display = "block";
+            }
+            createFairyDust(e.clientX, e.clientY);
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            mouseX = touch.clientX;
+            mouseY = touch.clientY;
+            if (!isCursorVisible) {
+                isCursorVisible = true;
+                cursorHolly.style.display = "block";
+            }
+            createFairyDust(touch.clientX, touch.clientY);
+        }, { passive: true }); // passiveオプションでスクロール性能向上
+
+        // Loop for smooth animation (Wave motion & Performance)
+        function animate() {
+            if (isCursorVisible) {
+                updateCursorHolly(mouseX, mouseY);
+            }
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // マウス位置にヒイラギを追従させる + 波のような動き
+        function updateCursorHolly(x, y) {
+            // left/topではなくtransformを使うことでパフォーマンス改善
+            // 波の動き: 時間経過でゆらゆらさせる
+            const time = Date.now();
+            const sway = Math.sin(time * 0.003) * 15; // ±15度の回転
+            const bob = Math.sin(time * 0.005) * 5;   // 上下5pxの浮遊感
+
+            // 元のCSSにある translate(-50%, -50%) scale(1.1) を維持しつつ、位置指定と揺れを追加
+            cursorHolly.style.transform = `translate(${x}px, ${y}px) translate(-50%, -50%) scale(1.1) translateY(${bob}px) rotate(${sway}deg)`;
+
+            // left/topはリセット（CSSで0になっているが念のため上書きしないようにstyle操作は削除）
+            // cursorHolly.style.left = ... (不要)
+        }
+
+        let lastDustTime = 0;
+
+        function createFairyDust(x, y) {
+            // スロットリング: 生成頻度を制限して負荷を下げる (50msに1回など)
+            const now = Date.now();
+            if (now - lastDustTime < 50) return;
+            lastDustTime = now;
+
+            if (Math.random() < 0.1) return;
+
+            const count = 2; // 一度に生成する数を少し減らして負荷軽減 (3 -> 2)
+
+            for (let i = 0; i < count; i++) {
+                const star = document.createElement('div');
+                star.className = 'cursor-star';
+
+                const colors = ['#ffffff', '#f0ffff', '#e0ffff', '#fffacd'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                star.style.background = color;
+                star.style.boxShadow = `0 0 3px ${color}, 0 0 6px ${color}`;
+
+                const offsetX = (Math.random() - 0.5) * 20;
+                const offsetY = (Math.random() - 0.5) * 20;
+
+                star.style.left = (x + offsetX) + 'px';
+                star.style.top = (y + offsetY) + 'px';
+
+                const size = 2 + Math.random() * 4;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+
+                const tx = (Math.random() - 0.5) * 50 + 'px';
+                const ty = -30 - Math.random() * 40 + 'px';
+
+                star.style.setProperty('--tx', tx);
+                star.style.setProperty('--ty', ty);
+
+                document.body.appendChild(star);
+
+                // 時間延長に合わせて削除タイミングも変更 (4s)
+                setTimeout(() => {
+                    if (star.parentNode) star.parentNode.removeChild(star);
+                }, 4000);
+            }
         }
     </script>
 </body>
