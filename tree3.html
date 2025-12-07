@@ -118,7 +118,7 @@
                 0 0 6px 1px rgba(255, 223, 0, 0.6);
             top: calc(var(--y, 0) * 1%);
             transform:
-                translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
+                translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * var(--radius-unit, 1vmin)));
             animation: blink 3s infinite ease-in-out;
             animation-delay: var(--delay, 0s);
         }
@@ -129,12 +129,12 @@
             100% {
                 opacity: 0.6;
                 /* 完全に消さない */
-                transform: translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin)) scale(0.9);
+                transform: translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * var(--radius-unit, 1vmin))) scale(0.9);
             }
 
             50% {
                 opacity: 1;
-                transform: translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin)) scale(1.1);
+                transform: translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * var(--radius-unit, 1vmin))) scale(1.1);
             }
         }
 
@@ -291,7 +291,7 @@
             height: 4.5vmin;
             top: calc(var(--y, 0) * 1%);
             transform:
-                translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
+                translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * var(--radius-unit, 1vmin)));
         }
 
         /* マウス追従ヒイラギ (マウスストーカー) */
@@ -317,9 +317,13 @@
         /* スマートフォン・縦画面向けの最適化 */
         @media (max-width: 768px) and (orientation: portrait) {
             tree {
-                /* ツリーを大きく表示 */
+                /* 半径の計算単位を大きくして、ツリーを「太く/広く」する */
+                --radius-unit: 1.4vmin;
+
+                /* 高さを抑えて「短く」する (110vmin -> 85vmin) */
+                height: 85vmin;
                 width: 80vmin;
-                height: 110vmin;
+                /* コンテナ幅は維持(あるいは調整) */
                 margin-top: -10vmin;
             }
 
@@ -330,8 +334,8 @@
             }
 
             .message-container {
-                /* 文字位置の調整 */
-                bottom: 10vh;
+                /* 文字位置の調整: ツリーが短くなった分、上に上げる (10vh -> 18vh) */
+                bottom: 18vh;
                 height: 15vh;
             }
 
