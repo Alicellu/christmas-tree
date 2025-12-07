@@ -98,94 +98,6 @@
             height: 100%;
         }
 
-        < !DOCTYPE html><html lang="ja"><head><meta charset="UTF-8" /><title>3D Christmas Tree</title>< !-- 手書き風フォントの読み込み --><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet"><style>* {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: #000;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden;
-            /* スクロール防止 */
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
-            position: relative;
-            /* 星の基準 */
-        }
-
-        .main-wrapper {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            /* 画面いっぱいまで拡大 */
-            width: 100vmin;
-            height: 100vmin;
-            position: relative;
-            z-index: 10;
-            /* 星より手前 */
-        }
-
-        .scene {
-            perspective: 90vmin;
-            position: relative;
-            width: 100%;
-            height: 100%;
-            /* 親に合わせて最大化 */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        tree {
-            position: relative;
-            /* ツリーサイズさらに拡大 */
-            height: 80vmin;
-            width: 45vmin;
-            transform-style: preserve-3d;
-            display: block;
-            animation: spin 2.5s infinite linear;
-            margin-top: -5vmin;
-            /* 少し調整 */
-            will-change: transform;
-            /* パフォーマンス最適化 */
-        }
-
-        @keyframes spin {
-            from {
-                transform: rotateX(18deg) rotateY(0deg);
-            }
-
-            to {
-                transform: rotateX(18deg) rotateY(360deg);
-            }
-        }
-
-        /* 星 */
-        .star {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            transform: translate(-50%, -60%);
-            width: 12vmin;
-            /* さらに拡大 */
-            height: 12vmin;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* ドロップシャドウも金色系に */
-            filter: drop-shadow(0 0 1px #e6c200) drop-shadow(0 0 4px #e6c200);
-        }
-
-        .star__svg {
-            width: 100%;
-            height: 100%;
-        }
-
         /* ライト */
         .tree__light {
             position: absolute;
@@ -248,30 +160,12 @@
             font-family: 'Great Vibes', cursive;
             font-size: 60px;
             fill: url(#goldGradient);
-            fill-opacity: 0;
-            stroke: #e6c200;
-            stroke-width: 1.5px;
-            stroke-dasharray: 3000;
-            stroke-dashoffset: 3000;
-            animation:
-                draw 4s ease-out forwards,
-                fill-in 2s ease-in-out 3s forwards;
+            fill-opacity: 1;
+            /* 最初から表示 */
+            stroke: none;
+            /* ストロークなし */
             filter: drop-shadow(0 0 2px rgba(255, 215, 0, 0.8));
-        }
-
-        /* 線を描く */
-        @keyframes draw {
-            to {
-                stroke-dashoffset: 0;
-            }
-        }
-
-        /* 中身を不透明にする（徐々に表示） */
-        @keyframes fill-in {
-            to {
-                fill-opacity: 1;
-                stroke-width: 0;
-            }
+            /* アニメーション削除 */
         }
 
         /* 背景の星（ランダム配置用） */
@@ -311,21 +205,20 @@
             }
         }
 
-        /* 水滴ライト: ゴールドグラデーション、will-change削除 */
+        /* 水滴ライト: 色を元（白）に戻す、will-change削除済み */
         .rain-drop {
             position: absolute;
             top: -15vh;
             /* 画面外からスタート */
             width: 2px;
             height: 15vh;
-            /* ゴールドグラデーションに変更 */
-            background: linear-gradient(to bottom, transparent, #BF953F, #FCF6BA, #AA771C, transparent);
+            /* 白に戻す */
+            background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.9));
             animation: fall linear infinite;
             pointer-events: none;
             z-index: 20;
             /* ツリーより手前、文字より奥 */
             opacity: 0;
-            /* will-change削除: パフォーマンス最適化 */
         }
 
         @keyframes fall {
@@ -354,11 +247,11 @@
     <div class="main-wrapper">
         <div class="scene">
             <tree id="tree">
-                <!-- 星: グラデーション塗りつぶし -->
+                <!-- 星: 枠線のみ -->
                 <div class="star">
                     <svg class="star__svg" viewBox="0 0 100 100">
                         <defs>
-                            <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <linearGradient id="starStrokeGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                                 <stop offset="0%" stop-color="#BF953F" />
                                 <stop offset="25%" stop-color="#FCF6BA" />
                                 <stop offset="50%" stop-color="#B38728" />
@@ -366,8 +259,8 @@
                                 <stop offset="100%" stop-color="#AA771C" />
                             </linearGradient>
                         </defs>
-                        <polygon points="50,5 61,35 95,38 68,59 76,91 50,73 24,91 32,59 5,38 39,35"
-                            fill="url(#starGradient)" stroke="none" />
+                        <polygon points="50,5 61,35 95,38 68,59 76,91 50,73 24,91 32,59 5,38 39,35" fill="none"
+                            stroke="url(#starStrokeGradient)" stroke-width="5" stroke-linejoin="round" />
                     </svg>
                 </div>
             </tree>
@@ -431,8 +324,8 @@
             tree.appendChild(light);
         }
 
-        // 背景の星（全画面ランダム）- 30%削減
-        const STAR_COUNT = 100;
+        // 背景の星（全画面ランダム）- さらに20%減 (100 -> 80)
+        const STAR_COUNT = 80;
 
         for (let i = 0; i < STAR_COUNT; i++) {
             const s = document.createElement("div");
@@ -465,7 +358,7 @@
             document.body.appendChild(s);
         }
 
-        // 水滴ライト (Rain Lights) - 30%削減
+        // 水滴ライト (Rain Lights) - 数は前回28個になってるので維持
         const RAIN_COUNT = 28;
 
         for (let i = 0; i < RAIN_COUNT; i++) {
