@@ -63,6 +63,8 @@
             animation: spin 2.5s infinite linear;
             margin-top: -5vmin;
             /* 少し調整 */
+            will-change: transform;
+            /* パフォーマンス最適化 */
         }
 
         @keyframes spin {
@@ -87,8 +89,8 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            filter:
-                drop-shadow(0 0 1px #ffe66d) drop-shadow(0 0 4px #ffe66d);
+            /* ドロップシャドウも金色系に */
+            filter: drop-shadow(0 0 1px #e6c200) drop-shadow(0 0 4px #e6c200);
         }
 
         .star__svg {
@@ -107,13 +109,16 @@
             border-radius: 50%;
             background: radial-gradient(circle, #ffffff, #ff1744);
             box-shadow:
-                0 0 3px #ff1744,
-                0 0 6px #ff1744;
+                0 0 2px #ff1744,
+                0 0 4px #ff1744;
+            /* 負荷軽減のため縮小 */
             top: calc(var(--y, 0) * 1%);
             transform:
                 translate(-50%, -50%) rotateY(calc(var(--rotate, 0) * 1deg)) translateZ(calc(var(--radius, 0) * 1vmin));
             animation: blink 2s infinite ease-in-out;
             animation-delay: var(--delay, 0s);
+            will-change: transform, opacity;
+            /* パフォーマンス最適化 */
         }
 
         @keyframes blink {
@@ -232,6 +237,8 @@
             z-index: 20;
             /* ツリーより手前、文字より奥 */
             opacity: 0;
+            will-change: transform;
+            /* パフォーマンス最適化 */
         }
 
         @keyframes fall {
@@ -260,11 +267,20 @@
     <div class="main-wrapper">
         <div class="scene">
             <tree id="tree">
-                <!-- 星 -->
+                <!-- 星: グラデーション塗りつぶし -->
                 <div class="star">
                     <svg class="star__svg" viewBox="0 0 100 100">
-                        <polygon points="50,5 61,35 95,38 68,59 76,91 50,73 24,91 32,59 5,38 39,35" fill="none"
-                            stroke="#ffe66d" stroke-width="5" stroke-linejoin="round" />
+                        <defs>
+                            <linearGradient id="starGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" stop-color="#BF953F" />
+                                <stop offset="25%" stop-color="#FCF6BA" />
+                                <stop offset="50%" stop-color="#B38728" />
+                                <stop offset="75%" stop-color="#FBF5B7" />
+                                <stop offset="100%" stop-color="#AA771C" />
+                            </linearGradient>
+                        </defs>
+                        <polygon points="50,5 61,35 95,38 68,59 76,91 50,73 24,91 32,59 5,38 39,35"
+                            fill="url(#starGradient)" stroke="none" />
                     </svg>
                 </div>
             </tree>
